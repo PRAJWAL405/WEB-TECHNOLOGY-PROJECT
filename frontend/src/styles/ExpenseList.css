@@ -1,0 +1,192 @@
+.expense-list {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.expense-item-row {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.expense-item-row:hover {
+    background-color: var(--bg-secondary);
+    transform: scale(1.002);
+}
+
+.expense-item-row:last-child {
+    border-bottom: none;
+}
+
+/* Date Column */
+.expense-date-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 1.5rem;
+    color: var(--text-muted);
+    width: 48px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.month {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.day {
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1;
+}
+
+/* Icon Column */
+.expense-icon-col {
+    margin-right: 1.25rem;
+}
+
+.category-icon-bg {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.expense-item-row:hover .category-icon-bg {
+    transform: rotate(5deg);
+}
+
+/* Info Column */
+.expense-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.expense-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+}
+
+.group-tag {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* Amount Column */
+.expense-amount-col {
+    text-align: right;
+    margin-right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.payer-info,
+.lending-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.3;
+}
+
+.lending-info {
+    margin-top: 6px;
+}
+
+.label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.amount {
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.amount.positive {
+    color: var(--success);
+}
+
+.amount.negative {
+    color: var(--error);
+}
+
+/* Actions Column */
+.expense-actions-col {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity var(--transition-base), transform var(--transition-base);
+    transform: translateX(10px);
+}
+
+.expense-item-row:hover .expense-actions-col {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.action-btn {
+    background: var(--bg-tertiary);
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    color: var(--text-muted);
+}
+
+.edit-btn:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.delete-btn:hover {
+    color: white;
+    background: var(--error);
+}
+
+@media (max-width: 600px) {
+    .expense-actions-col {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .lending-info {
+        display: none;
+    }
+
+    .expense-item-row {
+        padding: 1rem;
+    }
+}

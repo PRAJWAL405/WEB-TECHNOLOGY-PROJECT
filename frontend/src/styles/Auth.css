@@ -1,0 +1,126 @@
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    background: radial-gradient(circle at top right, #e6f7f2 0%, #f8fafc 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-page::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: var(--primary-light);
+    border-radius: 50%;
+    top: -200px;
+    right: -200px;
+    filter: blur(100px);
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.auth-logo {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    display: block;
+}
+
+.auth-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: var(--spacing-xs);
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.auth-form {
+    margin-bottom: var(--spacing-xl);
+}
+
+.auth-form .form-group:last-of-type {
+    margin-bottom: var(--spacing-xl);
+}
+
+.auth-form .btn {
+    width: 100%;
+}
+
+.auth-footer {
+    text-align: center;
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--border-color);
+}
+
+.auth-footer p {
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.95rem;
+}
+
+.auth-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all var(--transition-base);
+}
+
+.auth-link:hover {
+    color: var(--primary-dark);
+}
+
+.error-message {
+    background: var(--secondary-light);
+    border: 1px solid rgba(255, 101, 47, 0.2);
+    color: var(--error);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: var(--spacing-xl);
+    }
+
+    .auth-title {
+        font-size: 1.75rem;
+    }
+}

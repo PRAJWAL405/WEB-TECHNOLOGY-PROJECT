@@ -47,6 +47,8 @@ router.post('/register', [
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                inviteCode: user.inviteCode,
+                createdAt: user.createdAt,
                 token: generateToken(user._id)
             });
         }
@@ -78,6 +80,8 @@ router.post('/login', [
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                inviteCode: user.inviteCode,
+                createdAt: user.createdAt,
                 token: generateToken(user._id)
             });
         } else {
@@ -99,7 +103,9 @@ router.get('/profile', protect, async (req, res) => {
             res.json({
                 _id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                inviteCode: user.inviteCode,
+                createdAt: user.createdAt
             });
         } else {
             res.status(404).json({ message: 'User not found' });

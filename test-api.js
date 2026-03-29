@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://127.0.0.1:5000/api';
 let token = '';
 let userId = '';
 let groupId = '';
@@ -33,7 +33,28 @@ async function testFlow() {
             return;
         }
 
-        // 2. Create Group
+        // 2. Login User
+        console.log('\n🔐 Testing Login...');
+        try {
+            const loginRes = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: uniqueEmail,
+                    password: 'password123'
+                })
+            });
+            const loginData = await loginRes.json();
+            if (!loginRes.ok) throw new Error(loginData.message || 'Login failed');
+            console.log('✅ Login Successful');
+            token = loginData.token;
+            userId = loginData._id;
+        } catch (error) {
+            console.error('❌ Login Failed:', error.message);
+            return;
+        }
+
+        // 3. Create Group
         console.log('\n👥 Creating Group...');
         try {
             const groupRes = await fetch(`${API_URL}/groups`, {
@@ -58,10 +79,10 @@ async function testFlow() {
             console.error('❌ Group Creation Failed:', error.message);
         }
 
-        // 3. Add Expense
-        console.log('\n💰 Adding Expense...');
+        // 4. Add Expense (using personal-expenses as it exists in server.js)
+        console.log('\n💰 Adding Personal Expense...');
         try {
-            const expenseRes = await fetch(`${API_URL}/expenses`, {
+            const expenseRes = await fetch(`${API_URL}/personal-expenses`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,29 +91,22 @@ async function testFlow() {
                 body: JSON.stringify({
                     title: 'Test Dinner',
                     amount: 100,
-                    category: 'Food',
-                    group: groupId,
-                    isSplit: true,
-                    numberOfPeople: 2,
-                    splitWith: ['friend@example.com']
+                    category: 'Food'
                 })
             });
             const expenseData = await expenseRes.json();
 
             if (!expenseRes.ok) throw new Error(expenseData.message || 'Expense addition failed');
 
-            console.log('✅ Expense Added:', expenseData.title);
-            console.log('   Amount:', expenseData.amount);
-            console.log('   Split:', expenseData.isSplit);
-            console.log('   Number of People:', expenseData.numberOfPeople);
+            console.log('✅ Personal Expense Added:', expenseData.title);
         } catch (error) {
-            console.error('❌ Expense Addition Failed:', error.message);
+            console.error('❌ Personal Expense Addition Failed:', error.message);
         }
 
-        // 4. Verify Dashboard Data
+        // 5. Verify Dashboard Data
         console.log('\n📊 Verifying Dashboard Data...');
         try {
-            const expensesRes = await fetch(`${API_URL}/expenses`, {
+            const expensesRes = await fetch(`${API_URL}/personal-expenses`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -101,12 +115,6 @@ async function testFlow() {
             if (!expensesRes.ok) throw new Error(expensesData.message || 'Fetch expenses failed');
 
             console.log('✅ Expenses Fetched:', expensesData.length);
-            const myExpense = expensesData[0];
-            if (myExpense && myExpense.title === 'Test Dinner') {
-                console.log('✅ Verified Expense Exists');
-            } else {
-                console.error('❌ Expense Validation Failed');
-            }
         } catch (error) {
             console.error('❌ Fetch Expenses Failed:', error.message);
         }

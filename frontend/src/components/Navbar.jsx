@@ -27,10 +27,19 @@ const Navbar = () => {
                                 <button onClick={() => navigate('/friends')} className="nav-link">
                                     Friends
                                 </button>
+                                <button onClick={() => navigate('/profile')} className="nav-link">
+                                    Profile
+                                </button>
                             </div>
                             <div className="navbar-user">
                                 <span className="user-name">Hello, {user.name}</span>
-                                <button onClick={logout} className="btn btn-secondary btn-small">
+                                <button
+                                    onClick={() => {
+                                        logout();
+                                        navigate('/login');
+                                    }}
+                                    className="btn btn-secondary btn-small"
+                                >
                                     Logout
                                 </button>
                             </div>

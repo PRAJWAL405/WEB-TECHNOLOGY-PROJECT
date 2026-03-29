@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/SplitExpense.css';
 
-const ExpenseForm = ({ onSubmit, initialData = null, onCancel, defaultType = 'personal', groupMembers = [] }) => {
+const ExpenseForm = ({ onSubmit, initialData = null, onCancel, defaultType = 'personal', groupMembers = [], groups = [] }) => {
     const defaultSplit = defaultType === 'splitwise' || groupMembers.length > 0;
 
     let currentUserId = null;
@@ -101,20 +101,25 @@ const ExpenseForm = ({ onSubmit, initialData = null, onCancel, defaultType = 'pe
         if (!formData.title.trim()) return alert('Title is required');
         if (!formData.amount || parseFloat(formData.amount) <= 0) return alert('Please enter a valid amount');
 
-        // Format splits for group expense if needed
+        const amt = parseFloat(formData.amount);
         let submissionData = {
             ...formData,
-            amount: parseFloat(formData.amount)
+            amount: amt
         };
 
-        if (groupMembers.length > 0) {
-            const perPerson = parseFloat(calculatePerPerson());
-            submissionData.splits = groupMembers.filter(m => m).map(m => ({
+        // Handle Group Selection (either from prop or dropdown)
+        const activeGroupMembers = groupMembers.length > 0 ? groupMembers : (formData.group ? groups.find(g => g._id === formData.group)?.members : null);
+
+        if (activeGroupMembers && activeGroupMembers.length > 0) {
+            const count = activeGroupMembers.length;
+            const perPerson = amt / count;
+
+            submissionData.splits = activeGroupMembers.map(m => ({
                 user: m.user?._id || m.user,
                 amount: perPerson,
                 owed: (m.user?._id || m.user) === formData.paidBy ? 0 : perPerson
             }));
-            submissionData.description = formData.title; // Group expenses use description as title
+            submissionData.description = formData.title; // Group expenses often use description as title field in some schemas
         }
 
         onSubmit(submissionData);
@@ -231,6 +236,37 @@ const ExpenseForm = ({ onSubmit, initialData = null, onCancel, defaultType = 'pe
                 </div>
             )}
 
+            {formData.isSplit && groupMembers.length === 0 && groups.length > 0 && (
+                <div className="form-group">
+                    <label htmlFor="group" className="form-label">Select Group (Optional for ad-hoc)</label>
+                    <select
+                        id="group"
+                        name="group"
+                        className="form-select"
+                        value={formData.group || ''}
+                        onChange={(e) => {
+                            const groupId = e.target.value;
+                            const selectedGroup = groups.find(g => g._id === groupId);
+                            setFormData({
+                                ...formData,
+                                group: groupId,
+                                // If group selected, we use group members for split
+                                splits: selectedGroup ? selectedGroup.members.map(m => ({
+                                    user: m.user?._id || m.user,
+                                    name: m.name,
+                                    amount: 0
+                                })) : []
+                            });
+                        }}
+                    >
+                        <option value="">Ad-hoc Split (Personal Only)</option>
+                        {groups.map(g => (
+                            <option key={g._id} value={g._id}>{g.name}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             {(formData.isSplit || groupMembers.length > 0) && (
                 <div className="split-section">
                     {groupMembers.length === 0 ? (
@@ -299,7 +335,7 @@ const ExpenseForm = ({ onSubmit, initialData = null, onCancel, defaultType = 'pe
                         <div className="split-summary">
                             <div className="split-amount-display">
                                 <span className="split-label-text">Amount per person:</span>
-                                <span className="split-amount">${calculatePerPerson()}</span>
+                                <span className="split-amount">₹{calculatePerPerson()}</span>
                             </div>
                         </div>
                     )}

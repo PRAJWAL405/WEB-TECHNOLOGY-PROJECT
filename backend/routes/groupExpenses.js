@@ -2,12 +2,38 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import GroupExpense from '../models/GroupExpense.js';
 import Group from '../models/Group.js';
+import Friend from '../models/Friend.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
+
+// @route   GET /api/group-expenses
+// @desc    Get all group expenses for groups the user is in
+// @access  Private
+router.get('/', async (req, res) => {
+    try {
+        // First find all groups the user is in
+        const userGroups = await Group.find({
+            'members.user': req.user._id
+        });
+
+        const groupIds = userGroups.map(g => g._id);
+
+        const expenses = await GroupExpense.find({
+            group: { $in: groupIds }
+        })
+            .populate('paidBy', 'name email')
+            .populate('group', 'name')
+            .sort({ date: -1 });
+
+        res.json(expenses);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 // @route   POST /api/group-expenses
 // @desc    Add a new expense to a group
@@ -50,6 +76,34 @@ router.post('/', [
         // Update group total expenses
         groupDoc.totalExpenses = (groupDoc.totalExpenses || 0) + parseFloat(amount);
         await groupDoc.save();
+
+        // Update individual Friend balances
+        const payerId = req.body.paidBy || req.user._id;
+        for (const split of splits) {
+            const memberId = split.user;
+            if (memberId.toString() === payerId.toString()) continue;
+
+            // Find friendship between payer and member
+            const friendship = await Friend.findOne({
+                $or: [
+                    { requester: payerId, recipient: memberId },
+                    { requester: memberId, recipient: payerId }
+                ],
+                status: 'accepted'
+            });
+
+            if (friendship) {
+                const amount = parseFloat(split.amount);
+                // If payer is requester, positive balance means recipient owes them
+                // If payer is recipient, positive balance means requester owes them
+                if (friendship.requester.toString() === payerId.toString()) {
+                    friendship.balance += amount;
+                } else {
+                    friendship.balance -= amount;
+                }
+                await friendship.save();
+            }
+        }
 
         res.status(201).json(groupExpense);
     } catch (error) {
@@ -108,11 +162,33 @@ router.delete('/:id', async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to delete this expense' });
         }
 
-        // Update group total
-        groupDoc.totalExpenses = Math.max(0, (groupDoc.totalExpenses || 0) - expense.amount);
-        await groupDoc.save();
-
         await expense.deleteOne();
+
+        // Revert Friend balances
+        const payerId = expense.paidBy;
+        for (const split of expense.splits) {
+            const memberId = split.user;
+            if (memberId.toString() === payerId.toString()) continue;
+
+            const friendship = await Friend.findOne({
+                $or: [
+                    { requester: payerId, recipient: memberId },
+                    { requester: memberId, recipient: payerId }
+                ],
+                status: 'accepted'
+            });
+
+            if (friendship) {
+                const amount = parseFloat(split.amount);
+                if (friendship.requester.toString() === payerId.toString()) {
+                    friendship.balance -= amount;
+                } else {
+                    friendship.balance += amount;
+                }
+                await friendship.save();
+            }
+        }
+
         res.json({ message: 'Group expense removed' });
     } catch (error) {
         res.status(500).json({ message: error.message });

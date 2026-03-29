@@ -64,13 +64,13 @@ const ExpenseList = ({ expenses, onEdit, onDelete }) => {
                                         <>
                                             <div className="payer-info">
                                                 <span className="label">you paid</span>
-                                                <span className="amount">${(amount).toFixed(2)}</span>
+                                                <span className="amount">₹{(amount).toFixed(2)}</span>
                                             </div>
                                             {(expense.isSplit || expense.group) && (
                                                 <div className="lending-info">
                                                     <span className="label">you lent</span>
                                                     <span className="amount positive">
-                                                        ${(amount - perPerson).toFixed(2)}
+                                                        ₹{(amount - perPerson).toFixed(2)}
                                                     </span>
                                                 </div>
                                             )}
@@ -88,12 +88,12 @@ const ExpenseList = ({ expenses, onEdit, onDelete }) => {
                                         <>
                                             <div className="payer-info">
                                                 <span className="label">{expense.paidBy?.name || 'Someone'} paid</span>
-                                                <span className="amount">${(amount).toFixed(2)}</span>
+                                                <span className="amount">₹{(amount).toFixed(2)}</span>
                                             </div>
                                             <div className="lending-info">
                                                 <span className="label">you borrowed</span>
                                                 <span className="amount negative">
-                                                    ${safeMyOwe.toFixed(2)}
+                                                    ₹{safeMyOwe.toFixed(2)}
                                                 </span>
                                             </div>
                                         </>

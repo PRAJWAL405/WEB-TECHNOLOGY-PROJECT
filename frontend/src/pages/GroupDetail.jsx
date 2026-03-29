@@ -205,9 +205,7 @@ const GroupDetail = () => {
                             <h3 className="stat-label" style={{ marginBottom: '0.5rem' }}>
                                 {mId === currentUserId ? 'You' : (member.name || 'Unknown')}
                             </h3>
-                            <p className={`amount ${bal >= 0 ? 'positive' : 'negative'}`} style={{ fontSize: '1.5rem' }}>
-                                {bal >= 0 ? '+' : '-'}${Math.abs(bal).toFixed(2)}
-                            </p>
+                            {bal >= 0 ? '+' : '-'}₹{Math.abs(bal).toFixed(2)}
                             <p className="text-muted" style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
                                 {bal >= 0 ? (bal === 0 ? 'Settled' : 'is owed') : 'owes'}
                             </p>

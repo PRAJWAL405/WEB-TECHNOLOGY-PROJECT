@@ -170,9 +170,7 @@ const Friends = () => {
                                                 <p className="label" style={{ margin: 0, textTransform: 'lowercase', fontSize: '0.75rem' }}>
                                                     {friend.balance > 0 ? (isRequester ? 'owes you' : 'you owe') : (isRequester ? 'you owe' : 'owes you')}
                                                 </p>
-                                                <p className={`amount ${((friend.balance > 0 && isRequester) || (friend.balance < 0 && !isRequester)) ? 'positive' : 'negative'}`} style={{ margin: 0, fontWeight: '600' }}>
-                                                    ${Math.abs(friend.balance).toFixed(2)}
-                                                </p>
+                                                ₹{Math.abs(friend.balance).toFixed(2)}
                                             </div>
                                         ) : (
                                             <span className="text-secondary" style={{ fontSize: '0.8rem' }}>Settled up</span>

@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupDetail from './pages/GroupDetail';
 import Friends from './pages/Friends';
+import Profile from './pages/Profile';
 import InviteHandler from './pages/InviteHandler';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
@@ -61,6 +62,14 @@ function AppRoutes() {
                         <PublicRoute>
                             <Register />
                         </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <PrivateRoute>
+                            <Profile />
+                        </PrivateRoute>
                     }
                 />
                 <Route

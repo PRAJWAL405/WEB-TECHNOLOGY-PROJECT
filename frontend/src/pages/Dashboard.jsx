@@ -9,7 +9,7 @@ import '../styles/Dashboard.css';
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
     const [expenses, setExpenses] = useState([]);
-    const [friends, setFriends] = useState([]);
+    const [groups, setGroups] = useState([]);
     const [settlements, setSettlements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -25,18 +25,18 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [personalRes, groupsRes, friendsRes, settlementsRes] = await Promise.all([
+            const [personalRes, sharedRes, groupsListRes, settlementsRes] = await Promise.all([
                 api.get('/personal-expenses').catch(err => ({ data: [] })),
                 api.get('/group-expenses').catch(err => ({ data: [] })),
-                api.get('/friends').catch(err => ({ data: [] })),
+                api.get('/groups').catch(err => ({ data: [] })),
                 api.get('/settlements/user').catch(err => ({ data: [] }))
             ]);
 
             const personalExpenses = Array.isArray(personalRes.data) ? personalRes.data : [];
-            const groupExpenses = Array.isArray(groupsRes.data) ? groupsRes.data : [];
+            const groupExpenses = Array.isArray(sharedRes.data) ? sharedRes.data : [];
 
             setExpenses([...personalExpenses, ...groupExpenses]);
-            setFriends(Array.isArray(friendsRes.data) ? friendsRes.data : []);
+            setGroups(Array.isArray(groupsListRes.data) ? groupsListRes.data : []);
             setSettlements(Array.isArray(settlementsRes.data) ? settlementsRes.data : []);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -131,7 +131,7 @@ const Dashboard = () => {
                 amount: parseFloat(formData.amount)
             };
 
-            const endpoint = '/personal-expenses';
+            const endpoint = formData.group ? '/group-expenses' : '/personal-expenses';
             await api.post(endpoint, preparedData);
 
             setShowForm(false);
@@ -197,23 +197,23 @@ const Dashboard = () => {
                         <div className="balance-card total-balance">
                             <h3>Total Balance</h3>
                             <p className={stats.balance >= 0 ? 'positive' : 'negative'}>
-                                {stats.balance >= 0 ? '+' : '-'}${Math.abs(stats.balance).toFixed(2)}
+                                {stats.balance >= 0 ? '+' : '-'}₹{Math.abs(stats.balance).toFixed(2)}
                             </p>
                         </div>
                         <div className="balance-card you-owe">
                             <h3>you owe</h3>
-                            <p>${stats.totalOwe.toFixed(2)}</p>
+                            <p>₹{stats.totalOwe.toFixed(2)}</p>
                         </div>
                         <div className="balance-card you-are-owed">
                             <h3>you are owed</h3>
-                            <p>${stats.totalOwed.toFixed(2)}</p>
+                            <p>₹{stats.totalOwed.toFixed(2)}</p>
                         </div>
                     </>
                 ) : (
                     <div className="balance-card personal-spend">
                         <h3>Total Spending</h3>
                         <p className="negative">
-                            ${stats.totalSpent.toFixed(2)}
+                            ₹{stats.totalSpent.toFixed(2)}
                         </p>
                     </div>
                 )}
@@ -238,6 +238,7 @@ const Dashboard = () => {
                             initialData={editingExpense}
                             onCancel={() => setShowForm(false)}
                             defaultType={activeTab} // Pass tab to form to default to personal/split
+                            groups={groups}
                         />
                     </div>
                 </div>
